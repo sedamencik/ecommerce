@@ -1,4 +1,4 @@
-package com.demo.enoca.entity;
+package com.demo.ecommerce.entity;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
