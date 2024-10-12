@@ -8,11 +8,11 @@ import lombok.Setter;
 @Table(name = "ordered_products")
 @Getter
 @Setter
-public class OrderItem extends BaseEntity{
+public class OrderItemEntity extends BaseEntity{
     // Bir sipariş öğesi bir siparişe aittir
     @ManyToOne
-    @JoinColumn(name = "order_id", nullable = false)
-    private Order order;
+    @JoinColumn(name = "order_entity_id", nullable = false)
+    private OrderEntity orderEntity;
 
     private Integer productId;
 

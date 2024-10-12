@@ -1,23 +1,23 @@
 package com.demo.ecommerce.dto;
 
-import com.demo.ecommerce.entity.Product;
+import com.demo.ecommerce.entity.ProductEntity;
 
 public class CartItemDTO {
-    public Product product;
+    public ProductEntity productEntity;
     public Integer quantity;
 
 
-    public CartItemDTO(Product product, Integer quantity) {
-        this.product = product;
+    public CartItemDTO(ProductEntity productEntity, Integer quantity) {
+        this.productEntity = productEntity;
         this.quantity = quantity;
     }
 
-    public Product getProduct() {
-        return product;
+    public ProductEntity getProductEntity() {
+        return productEntity;
     }
 
-    public void setProduct(Product product) {
-        this.product = product;
+    public void setProductEntity(ProductEntity productEntity) {
+        this.productEntity = productEntity;
     }
 
     public Integer getQuantity() {

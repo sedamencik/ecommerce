@@ -1,7 +1,5 @@
 package com.demo.ecommerce.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -12,7 +10,7 @@ import java.util.List;
 @Table(name = "customers")
 @Getter
 @Setter
-public class Customer extends BaseEntity{
+public class CustomerEntity extends BaseEntity{
 
     private String name;
     private String email;
@@ -24,8 +22,8 @@ public class Customer extends BaseEntity{
     @OneToOne(mappedBy = "customerId", cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = false)
     private Cart cart = new Cart(this.getId());*/
 
-    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Order> orders;
+    @OneToMany(mappedBy = "customerEntity", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<OrderEntity> orderEntities;
 
 
     // Getters and Setters
@@ -47,8 +45,8 @@ public class Customer extends BaseEntity{
     }
 
 
-    public void setOrders(List<Order> orders) {
-        this.orders = orders;
+    public void setOrderEntities(List<OrderEntity> orderEntities) {
+        this.orderEntities = orderEntities;
     }
 
 

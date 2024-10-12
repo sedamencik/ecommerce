@@ -1,20 +1,18 @@
 package com.demo.ecommerce.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
 @Table(name = "carts")
 @Getter
 @Setter
 //@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-public class Cart extends BaseEntity {
+public class CartEntity extends BaseEntity {
     /*@OneToOne
     @JsonBackReference
     @JoinColumn(name = "customer_id", referencedColumnName = "id", nullable = false)
@@ -25,17 +23,17 @@ public class Cart extends BaseEntity {
 
     @OneToMany(mappedBy = "cartId", cascade = CascadeType.ALL, orphanRemoval = true)
     //@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-    private List<CartItem> items = new ArrayList<>();
+    private List<CartItemEntity> items = new ArrayList<>();
 
     private Double amount = 0.0;
 
 
 
-    public Cart(Long customerId) {
+    public CartEntity(Long customerId) {
         this.customerId = customerId;
     }
 
-    public Cart() {
+    public CartEntity() {
 
     }
 
@@ -61,11 +59,11 @@ public class Cart extends BaseEntity {
         this.customerId = customerId;
     }
 
-    public List<CartItem> getItems() {
+    public List<CartItemEntity> getItems() {
         return items;
     }
 
-    public void setItems(List<CartItem> items) {
+    public void setItems(List<CartItemEntity> items) {
         this.items = items;
     }
 

@@ -1,30 +1,26 @@
 package com.demo.ecommerce.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 
 @Entity
-public class CartItem extends BaseEntity{
-    /*@ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "cart_id", nullable = false)
-    @JsonBackReference
-    private Cart cart;*/
-
+public class CartItemEntity extends BaseEntity{
     private Long cartId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_id", nullable = false)
-    private Product product;
+    @JoinColumn(name = "product_entity_id", nullable = false)
+    private ProductEntity productEntity;
     private int quantity;
 
-    public CartItem() {
+
+
+    public CartItemEntity() {
     }
 
-    public CartItem(Product product, int quantity, Double price) {
-        this.product = product;
+    public CartItemEntity(ProductEntity productEntity, int quantity, Double price) {
+        this.productEntity = productEntity;
         this.quantity = quantity;
     }
 
@@ -38,12 +34,12 @@ public class CartItem extends BaseEntity{
         this.cartId = cart;
     }
 
-    public Product getProduct() {
-        return product;
+    public ProductEntity getProductEntity() {
+        return productEntity;
     }
 
-    public void setProduct(Product product) {
-        this.product = product;
+    public void setProductEntity(ProductEntity productEntity) {
+        this.productEntity = productEntity;
     }
 
     public int getQuantity() {
@@ -56,5 +52,5 @@ public class CartItem extends BaseEntity{
 
 
     public Double getTotalPrice() {
-        return product.getPrice()*quantity;
+        return productEntity.getPrice()*quantity;
     }}

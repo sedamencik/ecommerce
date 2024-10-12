@@ -2,15 +2,14 @@ package com.demo.ecommerce.service.impl;
 
 import com.demo.ecommerce.dto.CartDTO;
 import com.demo.ecommerce.dto.CartItemDTO;
-import com.demo.ecommerce.entity.Cart;
-import com.demo.ecommerce.entity.CartItem;
+import com.demo.ecommerce.entity.CartEntity;
+import com.demo.ecommerce.entity.CartItemEntity;
 import com.demo.ecommerce.mapper.CartItemMapper;
 import com.demo.ecommerce.mapper.CartMapper;
 import com.demo.ecommerce.repository.CartItemRepository;
 import com.demo.ecommerce.repository.CartRepository;
 import com.demo.ecommerce.repository.ProductRepository;
 import com.demo.ecommerce.service.CartService;
-import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -86,35 +85,35 @@ public class CartServiceImpl implements CartService {
         CartItemDTO cartItemDTO = new CartItemDTO(null, null);
 
         cartRepository.findByCustomerId(customerId).ifPresent(cart -> {
-            cartItemRepository.findByCartIdAndProductId(cart.getId(), productId).ifPresentOrElse(
+            cartItemRepository.findByCartIdAndProductEntityId(cart.getId(), productId).ifPresentOrElse(
                     cartItem -> {
                         // Mevcut ürün varsa miktarı güncelle
                         cartItem.setQuantity(cartItem.getQuantity() + quantity);
                         cartItemRepository.save(cartItem);
 
                         // Toplam tutarı yeni miktar ve fiyatla güncelle
-                        cart.setAmount(cart.getAmount() + (cartItem.getProduct().getPrice() * quantity));
+                        cart.setAmount(cart.getAmount() + (cartItem.getProductEntity().getPrice() * quantity));
                         cartRepository.save(cart);
                     },
                     () -> {
                         // Mevcut ürün yoksa, yeni bir CartItem oluştur
-                        CartItem newCartItem = new CartItem();
-                        newCartItem.setCart(cart.getId());
-                        newCartItem.setProduct(productRepository.findById(productId).orElseThrow(() ->
+                        CartItemEntity newCartItemEntity = new CartItemEntity();
+                        newCartItemEntity.setCart(cart.getId());
+                        newCartItemEntity.setProductEntity(productRepository.findById(productId).orElseThrow(() ->
                                 new RuntimeException("Ürün bulunamadı.")));
-                        newCartItem.setQuantity(quantity);
+                        newCartItemEntity.setQuantity(quantity);
 
 
                         //cart.getItems().add(newCartItem);
-                        List<CartItem> cartItems = cart.getItems();
-                        cartItems.add(newCartItem);
-                        cart.setItems(cartItems);
+                        List<CartItemEntity> cartItemEntities = cart.getItems();
+                        cartItemEntities.add(newCartItemEntity);
+                        cart.setItems(cartItemEntities);
 
                         // Toplam tutarı yeni miktar ve fiyatla güncelle
-                        cart.setAmount(cart.getAmount() + newCartItem.getProduct().getPrice() * newCartItem.getQuantity());
+                        cart.setAmount(cart.getAmount() + newCartItemEntity.getProductEntity().getPrice() * newCartItemEntity.getQuantity());
 
                         // Yeni CartItemi veritabanına kaydet
-                        cartItemRepository.save(newCartItem);
+                        cartItemRepository.save(newCartItemEntity);
                         cartRepository.save(cart);
                     }
             );
@@ -147,9 +146,9 @@ public class CartServiceImpl implements CartService {
         List<CartItemDTO> cartItemDTOs = new ArrayList<>();
         CartItemDTO cartItemDTO = new CartItemDTO(null, null);
 
-        Optional<Cart> cart = cartRepository.findByCustomerId(customerId);
+        Optional<CartEntity> cart = cartRepository.findByCustomerId(customerId);
         if (cart != null) {
-            Optional<CartItem> cartItem = cartItemRepository.findByCartIdAndProductId(cart.get().getId(), productId);
+            Optional<CartItemEntity> cartItem = cartItemRepository.findByCartIdAndProductEntityId(cart.get().getId(), productId);
             if (cartItem != null) {
                 if(cartItem.get().getQuantity() > 1){
                     cartItem.get().setQuantity(cartItem.get().getQuantity() - 1);
@@ -166,7 +165,7 @@ public class CartServiceImpl implements CartService {
             }
         }
         cart.get().getItems().forEach(item -> {
-            cartItemDTO.setProduct(item.getProduct());
+            cartItemDTO.setProductEntity(item.getProductEntity());
             cartItemDTO.setQuantity(item.getQuantity());
             cartItemDTOs.add(cartItemDTO);
         });

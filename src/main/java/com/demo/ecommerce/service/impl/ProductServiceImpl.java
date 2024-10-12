@@ -2,11 +2,10 @@ package com.demo.ecommerce.service.impl;
 
 import com.demo.ecommerce.dto.ProductRequestDTO;
 import com.demo.ecommerce.dto.ProductResponseDTO;
-import com.demo.ecommerce.entity.Product;
+import com.demo.ecommerce.entity.ProductEntity;
 import com.demo.ecommerce.mapper.ProductMapper;
 import com.demo.ecommerce.repository.ProductRepository;
 import com.demo.ecommerce.service.ProductService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -25,52 +24,52 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ProductResponseDTO createProduct(ProductRequestDTO productRequest) {
 
-        Product product = productMapper.toProduct(productRequest);
-        product = productRepository.save(product);
-        return productMapper.toProductResponseDTO(product);
+        ProductEntity productEntity = productMapper.toProduct(productRequest);
+        productEntity = productRepository.save(productEntity);
+        return productMapper.toProductResponseDTO(productEntity);
 
     }
 
     @Override
     public ProductResponseDTO updateProduct(Long productId, ProductRequestDTO productRequest) {
 
-        Product product = productRepository.getReferenceById(productId);
-        if (product != null) {
-            product.setName(productRequest.getName());
-            product.setPrice(productRequest.getPrice());
-            product.setStock(productRequest.getStock());
+        ProductEntity productEntity = productRepository.getReferenceById(productId);
+        if (productEntity != null) {
+            productEntity.setName(productRequest.getName());
+            productEntity.setPrice(productRequest.getPrice());
+            productEntity.setStock(productRequest.getStock());
 
-            product = productRepository.save(product);
-            return productMapper.toProductResponseDTO(product);
+            productEntity = productRepository.save(productEntity);
+            return productMapper.toProductResponseDTO(productEntity);
         }
         return null;
     }
 
     @Override
     public void deleteProduct(Long productId) {
-        Product product = productRepository.getReferenceById(productId);
-        if (product != null) {
-            productRepository.delete(product);
+        ProductEntity productEntity = productRepository.getReferenceById(productId);
+        if (productEntity != null) {
+            productRepository.delete(productEntity);
         }
     }
 
     @Override
     public ProductResponseDTO getProduct(Long productId) {
 
-        Product product = productRepository.getReferenceById(productId);
-        if (product != null) {
-            return productMapper.toProductResponseDTO(product);
+        ProductEntity productEntity = productRepository.getReferenceById(productId);
+        if (productEntity != null) {
+            return productMapper.toProductResponseDTO(productEntity);
         }
         return null;
     }
 
     @Override
     public List<ProductResponseDTO> getAllProducts() {
-        List<Product> products = productRepository.findAll();
+        List<ProductEntity> productEntities = productRepository.findAll();
 
         List<ProductResponseDTO> productResponseDTOs = new ArrayList<>();
-        for (Product product : products) {
-            productResponseDTOs.add(productMapper.toProductResponseDTO(product));
+        for (ProductEntity productEntity : productEntities) {
+            productResponseDTOs.add(productMapper.toProductResponseDTO(productEntity));
         }
         return productResponseDTOs;
 

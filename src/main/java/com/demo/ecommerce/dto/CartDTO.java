@@ -1,8 +1,5 @@
 package com.demo.ecommerce.dto;
 
-import com.demo.ecommerce.entity.CartItem;
-import com.demo.ecommerce.entity.Product;
-
 import java.util.List;
 
 public class CartDTO {
@@ -17,7 +14,7 @@ public class CartDTO {
             this.amount = 0.0;
             return;
         }
-        this.amount = cartItems.stream().mapToDouble(item -> item.getProduct().getPrice() * item.getQuantity()).sum();
+        this.amount = cartItems.stream().mapToDouble(item -> item.getProductEntity().getPrice() * item.getQuantity()).sum();
     }
 
     public List<CartItemDTO> getItems() {
