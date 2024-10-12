@@ -5,6 +5,7 @@ import com.demo.ecommerce.dto.CustomerResponseDTO;
 import com.demo.ecommerce.entity.Cart;
 import com.demo.ecommerce.entity.Customer;
 import com.demo.ecommerce.mapper.CustomerMapper;
+import com.demo.ecommerce.repository.CartRepository;
 import com.demo.ecommerce.repository.CustomerRepository;
 import com.demo.ecommerce.service.CustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,23 +15,20 @@ import org.springframework.stereotype.Service;
 public class CustomerServiceImpl implements CustomerService {
     private final CustomerRepository customerRepository;
     private final CustomerMapper customerMapper;
+    private final CartRepository cartRepository;
 
     //@Autowired
-    public CustomerServiceImpl(CustomerRepository customerRepository, CustomerMapper customerMapper) {
+    public CustomerServiceImpl(CustomerRepository customerRepository, CustomerMapper customerMapper, CartRepository cartRepository) {
         this.customerRepository = customerRepository;
         this.customerMapper = customerMapper;
+        this.cartRepository = cartRepository;
     }
 
     @Override
     public CustomerResponseDTO addCustomer(CustomerRequestDTO customerRequest) {
         Customer customer = customerMapper.toEntity(customerRequest);
 
-        // Yeni bir Cart oluştur ve Customer ile ilişkilendir
-        Cart cart = new Cart();
-        cart.setCustomer(customer);
-        customer.setCart(cart);
-
-        customer = customerRepository.save(customer);
+        customerRepository.save(customer);
 
         return customerMapper.toDTO(customer);
     }

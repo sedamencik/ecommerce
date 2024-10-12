@@ -20,8 +20,8 @@ public class OpenApiConfig {
                         .title("E-Ticaret API")
                         .version("v1.0")
                         .description("Spring Boot E-Ticaret Projesi API Dokümantasyonu")
-                        .contact(new Contact().name("Adınız Soyadınız").email("email@example.com"))
-                        .license(new License().name("Apache 2.0").url("http://springdoc.org")))
+                        .contact(new Contact().name("Seda Mencik").email("seda.mencik@gmail.com"))
+                        .license(new License().name("Linkedin Account").url("https://www.linkedin.com/in/seda-mencik/")))
                 .components(new Components()
                         .addSecuritySchemes("BearerScheme",
                                 new SecurityScheme()
