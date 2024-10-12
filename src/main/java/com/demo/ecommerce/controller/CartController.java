@@ -36,9 +36,10 @@ public class CartController {
 
     @Operation(summary = "Ürün Ekle", description = "Müşteriye ait sepete ürün ekler.")
     @PostMapping("/{customerId}/{productId}/{quantity}")
-    public ResponseEntity<CartDTO> addProductToCart(@PathVariable Long customerId, @PathVariable Long productId, @PathVariable Integer quantity) {
-        CartDTO cart = cartService.addProductToCart(customerId, productId, quantity);
-        return new ResponseEntity<>(cart, HttpStatus.CREATED);
+    public ResponseEntity<Void> addProductToCart(@PathVariable Long customerId, @PathVariable Long productId, @PathVariable Integer quantity) {
+        cartService.addProductToCart(customerId, productId, quantity);
+        return new ResponseEntity<>(HttpStatus.OK);
+
     }
 
     @Operation(summary = "Ürün Eksilt", description = "Müşteriye ait sepetteki ürünü 1 adet siler.")

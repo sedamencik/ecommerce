@@ -9,6 +9,6 @@ public interface CartService {
     CartDTO getCart(Long customerId);
     //void updateCart(Long customerId, CartDTO cart);
     void emptyCart(Long customerId);
-    CartDTO addProductToCart(Long customerId, Long productId, Integer quantity);
+    void addProductToCart(Long customerId, Long productId, Integer quantity);
     CartDTO removeProductFromCart(Long customerId, Long productId);
 }

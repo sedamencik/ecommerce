@@ -4,16 +4,20 @@ import com.demo.ecommerce.dto.CartDTO;
 import com.demo.ecommerce.dto.CartItemDTO;
 import com.demo.ecommerce.entity.Cart;
 import com.demo.ecommerce.entity.CartItem;
+import com.demo.ecommerce.mapper.CartItemMapper;
+import com.demo.ecommerce.mapper.CartMapper;
 import com.demo.ecommerce.repository.CartItemRepository;
 import com.demo.ecommerce.repository.CartRepository;
 import com.demo.ecommerce.repository.ProductRepository;
 import com.demo.ecommerce.service.CartService;
+import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.swing.text.html.Option;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 
 @Service
 public class CartServiceImpl implements CartService {
@@ -21,29 +25,47 @@ public class CartServiceImpl implements CartService {
     private final CartItemRepository cartItemRepository;
     private final ProductRepository productRepository;
 
-    public CartServiceImpl(CartRepository cartRepository, CartItemRepository cartItemRepository, ProductRepository productRepository) {
+
+    private final CartMapper cartMapper;
+    private final CartItemMapper cartItemMapper;
+
+    public CartServiceImpl(CartRepository cartRepository, CartItemRepository cartItemRepository, ProductRepository productRepository, CartMapper cartMapper, CartItemMapper cartItemMapper) {
         this.cartRepository = cartRepository;
         this.cartItemRepository = cartItemRepository;
         this.productRepository = productRepository;
+        this.cartMapper = cartMapper;
+        this.cartItemMapper = cartItemMapper;
     }
 
     @Override
     public CartDTO getCart(Long customerId) {
-        CartDTO cartDTO = new CartDTO(null);
         List<CartItemDTO> cartItemDTOs = new ArrayList<>();
-        CartItemDTO cartItemDTO = new CartItemDTO(null, null);
+        AtomicReference<CartDTO> cartDTO = new AtomicReference<>(new CartDTO(new ArrayList<>()));
+
+
         cartRepository.findByCustomerId(customerId).ifPresent(cart -> {
 
+            //Hibernate.initialize(cart.getItems());
+
             cart.getItems().forEach(cartItem -> {
-                cartItemDTO.setProduct(cartItem.getProduct());
-                cartItemDTO.setQuantity(cartItem.getQuantity());
+
+                CartItemDTO cartItemDTO = cartItemMapper.toDTO(cartItem);
+
+                /*CartItemDTO cartItemDTO = new CartItemDTO(
+                        cartItem.getProduct(),
+                        cartItem.getQuantity()
+                );*/
+                //cartItemDTO.setProduct(cartItem.getProduct());
+                //cartItemDTO.setQuantity(cartItem.getQuantity());
                 cartItemDTOs.add(cartItemDTO);
             });
 
-            cartDTO.setItems(cartItemDTOs);
-            cartDTO.setTotalAmount(cart.getAmount());
+            cartDTO.set(cartMapper.toDTO(cart));
+
+            /*cartDTO.setItems(cartItemDTOs);
+            cartDTO.setTotalAmount(cart.getAmount());*/
         });
-        return cartDTO;
+        return cartDTO.get();
     }
 
     @Override
@@ -56,7 +78,8 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public CartDTO addProductToCart(Long customerId, Long productId, Integer quantity) {
+    @Transactional
+    public void addProductToCart(Long customerId, Long productId, Integer quantity) {
 
         CartDTO cartDTO = new CartDTO(new ArrayList<>());
         List<CartItemDTO> cartItemDTOs = new ArrayList<>();
@@ -100,7 +123,7 @@ public class CartServiceImpl implements CartService {
                 cartItemDTO.setProduct(cartItem.getProduct());
                 cartItemDTO.setQuantity(cartItem.getQuantity());
                 cartItemDTOs.add(cartItemDTO);
-            });*/
+            });
 
             cartItemRepository.findByCartId(cart.getId()).ifPresent(
                     cartItems -> {
@@ -114,10 +137,9 @@ public class CartServiceImpl implements CartService {
 
             cartDTO.setItems(cartItemDTOs);
             cartDTO.setTotalAmount(cart.getAmount());
+            */
 
         });
-        return cartDTO;
-
     }
 
     @Override

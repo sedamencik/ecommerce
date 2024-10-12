@@ -15,22 +15,24 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @Setter
 //@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Cart extends BaseEntity {
-    @OneToOne
+    /*@OneToOne
     @JsonBackReference
     @JoinColumn(name = "customer_id", referencedColumnName = "id", nullable = false)
-    private Customer customer;
+    private Customer customer;*/
 
-    //private Long customerId;
+    @Column(name = "customer_id", nullable = false)
+    private Long customerId;
 
     @OneToMany(mappedBy = "cartId", cascade = CascadeType.ALL, orphanRemoval = true)
+    //@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private List<CartItem> items = new ArrayList<>();
 
     private Double amount = 0.0;
 
 
 
-    public Cart(Customer customer) {
-        this.customer = customer;
+    public Cart(Long customerId) {
+        this.customerId = customerId;
     }
 
     public Cart() {
@@ -40,7 +42,7 @@ public class Cart extends BaseEntity {
     // Getters and Setters
 
 
-    public Customer getCustomer() {
+    /*public Customer getCustomer() {
         return customer;
     }
 
@@ -49,6 +51,14 @@ public class Cart extends BaseEntity {
         if (customer != null) {
             customer.setCart(this);
         }
+    }*/
+
+    public Long getCustomerId() {
+        return customerId;
+    }
+
+    public void setCustomerId(Long customerId) {
+        this.customerId = customerId;
     }
 
     public List<CartItem> getItems() {

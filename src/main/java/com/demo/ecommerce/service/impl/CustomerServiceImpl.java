@@ -30,6 +30,9 @@ public class CustomerServiceImpl implements CustomerService {
 
         customerRepository.save(customer);
 
+        Cart cart = new Cart(customer.getId());
+        cartRepository.save(cart);
+
         return customerMapper.toDTO(customer);
     }
 }
