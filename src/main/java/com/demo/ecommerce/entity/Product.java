@@ -14,6 +14,33 @@ public class Product extends BaseEntity{
 
     private Double price;
 
-    @Column(nullable = false)
+    //@Column(nullable = false)
     private Integer stock;
+
+    // Getters and Setters
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Double getPrice() {
+        return price;
+    }
+
+    public void setPrice(Double price) {
+        this.price = price;
+    }
+
+    public Integer getStock() {
+        return stock;
+    }
+
+    public void setStock(Integer stock) {
+        this.stock = stock;
+    }
+
+
 }

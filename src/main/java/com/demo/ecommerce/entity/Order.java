@@ -11,13 +11,15 @@ import java.util.List;
 @Getter
 @Setter
 public class Order extends BaseEntity{
-    @Column(nullable = false)
-    private Integer customerId;
+
+    @ManyToOne
+    @JoinColumn(name = "customer_id", nullable = false)
+    private Customer customer;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderItem> orderItems;
 
     private Double totalAmount;
 
-    private String status;
+    //private String status;
 }
