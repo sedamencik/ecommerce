@@ -22,7 +22,7 @@ public class CustomerEntity extends BaseEntity{
     @OneToOne(mappedBy = "customerId", cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = false)
     private Cart cart = new Cart(this.getId());*/
 
-    @OneToMany(mappedBy = "customerEntity", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "customerEntityId", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderEntity> orderEntities;
 
 

@@ -70,9 +70,17 @@ public class CartServiceImpl implements CartService {
     @Override
     public void emptyCart(Long customerId) {
         cartRepository.findByCustomerId(customerId).ifPresent(cart -> {
-            cart.setItems(new ArrayList<>());
+            cart.getItems().clear(); // Koleksiyonu temizle
             cart.setAmount(0.0);
             cartRepository.save(cart);
+/*
+            cartItemRepository.findByCartId(cart.getId()).ifPresent(
+                    cartItems -> {
+                        cartItems.forEach(cartItem -> {
+                            cartItemRepository.delete(cartItem);
+                        });
+                    }
+            );*/
         });
     }
 
