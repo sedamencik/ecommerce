@@ -56,7 +56,7 @@ public class OrderServiceImpl implements OrderService {
                         orderItemEntity.setProductEntityId(cartItemEntity.getProductEntity().getId());
                         orderItemEntity.setOrderEntityId(orderEntity.getId());
                         orderItemEntity.setQuantity(cartItemEntity.getQuantity());
-                        orderItemEntity.setPriceAtOrderTime(cartItemEntity.getTotalPrice());
+                        orderItemEntity.setPriceAtOrderTime(cartItemEntity.getTotalPrice() / cartItemEntity.getQuantity());
                         orderEntity.getOrderItemEntities().add(orderItemEntity);
 
                         orderItemRepository.save(orderItemEntity);
