@@ -85,6 +85,10 @@ public class CartServiceImpl implements CartService {
             cartRepository.findByCustomerId(customerId).ifPresentOrElse(cart -> {
                 cartItemRepository.findByCartIdAndProductEntityId(cart.getId(), productId).ifPresentOrElse(
                         cartItem -> {
+                            if(cartItem.getQuantity() + quantity > product.getStock()){
+                                throw new RuntimeException("Stokta yeterli ürün yok.");
+                            }
+
                             // Mevcut ürün varsa miktarı güncelle
                             cartItem.setQuantity(cartItem.getQuantity() + quantity);
                             cartItemRepository.save(cartItem);

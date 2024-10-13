@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Random;
+
 @RestController
 @RequestMapping("/api/customers")
 @Tag(name = "Müşteri Yönetimi", description = "Müşteri ile ilgili CRUD işlemleri")
@@ -37,6 +39,63 @@ public class CustomerController {
         }catch (Exception e){
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+
+    @Operation(summary = "algoritma")
+    @PostMapping("/algoritma")
+    public ResponseEntity<String> algoritma() {
+
+        int[] primaryArray = new int[100];
+        Random random = new Random();
+
+        for (int i = 0; i < primaryArray.length; i++) {
+            primaryArray[i] = random.nextInt(1000);
+        }
+
+        int[] secondaryArray = new int[99];
+        int randomIndex = random.nextInt(100);
+
+        for (int i = 0; i < secondaryArray.length; i++) {
+            if(i == randomIndex) {
+                continue;
+            }
+            secondaryArray[i] = primaryArray[randomIndex];
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        return new ResponseEntity<>("algoritma", HttpStatus.OK);
+
+
+    }
+
+    int findMissingNum(int[] primaryAr, int[] secondaryAr) {
+
+        for(int i = 0; i < primaryAr.length; i++) {
+            boolean isFound = false;
+            for(int j = 0; j < secondaryAr.length; j++) {
+                if(primaryAr[i] != secondaryAr[j]) {
+                    isFound = true;
+                    break;
+                }
+            }
+            if(isFound) {
+                return primaryAr[i];
+            }
+        }
+        return -1;
     }
 }
 
