@@ -11,7 +11,7 @@ E-commerce backend application developed using Java Spring Boot. This project ha
   - [Prerequisites](#prerequisites)
   - [Installation](#installation)
 - [Usage](#usage)
-  - [API Endpoints](#a-p-i-endpoints)
+  - [API Endpoints](#api-endpoints)
   - [H2Database](#h2-database)
 
 
