@@ -74,4 +74,22 @@ public class ProductServiceImpl implements ProductService {
         return productResponseDTOs;
 
     }
+
+    @Override
+    public Integer increaseStock(Long productId, Integer quantity) {
+        ProductEntity productEntity = productRepository.getReferenceById(productId);
+        Integer quantityToIncrease = quantity;
+
+        if (productEntity.getStock() < quantity) {
+            quantityToIncrease = productEntity.getStock();
+            productEntity.setStock(0);
+            productRepository.save(productEntity);
+            System.out.println("Warning: Sepetinizde yeterli ürün bulunmamaktadır. Yalnızca " + quantityToIncrease + " adet ile sipariş oluşturulmuştur.");
+        } else {
+            productEntity.setStock(productEntity.getStock() - quantityToIncrease);
+            productRepository.save(productEntity);
+        }
+
+        return quantityToIncrease;
+    }
 }

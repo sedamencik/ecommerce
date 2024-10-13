@@ -13,4 +13,5 @@ public interface ProductService {
     void deleteProduct(Long productId);
     ProductResponseDTO getProduct(Long productId);
     List<ProductResponseDTO> getAllProducts();
+    Integer increaseStock(Long productId, Integer quantity);
 }

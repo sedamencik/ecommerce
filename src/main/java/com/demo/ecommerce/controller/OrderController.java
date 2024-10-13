@@ -3,6 +3,7 @@ package com.demo.ecommerce.controller;
 import com.demo.ecommerce.dto.OrderDTO;
 import com.demo.ecommerce.service.CartService;
 import com.demo.ecommerce.service.OrderService;
+import com.demo.ecommerce.service.ProductService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,8 @@ public class OrderController {
     private OrderService orderService;
     @Autowired
     private CartService cartService;
+    @Autowired
+    private ProductService productService;
 
     @Operation(summary = "Sipariş Oluştur", description = "Müşteriye ait sepetin siparişini oluşturur ve sepeti boşaltır.")
     @PostMapping("/{customerId}")

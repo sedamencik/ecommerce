@@ -11,6 +11,7 @@ import com.demo.ecommerce.repository.CartRepository;
 import com.demo.ecommerce.repository.OrderItemRepository;
 import com.demo.ecommerce.repository.OrderRepository;
 import com.demo.ecommerce.service.OrderService;
+import com.demo.ecommerce.service.ProductService;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -28,13 +29,16 @@ public class OrderServiceImpl implements OrderService {
     private final OrderItemMapper orderItemMapper;
     private final OrderMapper orderMapper;
 
+    private final ProductService productService;
 
-    public OrderServiceImpl(OrderRepository orderRepository, OrderItemRepository orderItemRepository, CartRepository cartRepository, OrderItemMapper orderItemMapper, OrderMapper orderMapper) {
+
+    public OrderServiceImpl(OrderRepository orderRepository, OrderItemRepository orderItemRepository, CartRepository cartRepository, OrderItemMapper orderItemMapper, OrderMapper orderMapper, ProductService productService) {
         this.orderRepository = orderRepository;
         this.orderItemRepository = orderItemRepository;
         this.cartRepository = cartRepository;
         this.orderItemMapper = orderItemMapper;
         this.orderMapper = orderMapper;
+        this.productService = productService;
     }
 
     @Override
@@ -42,7 +46,7 @@ public class OrderServiceImpl implements OrderService {
         OrderEntity orderEntity = new OrderEntity();
 
         cartRepository.findByCustomerId(customerId)
-                .ifPresent(cartEntity -> {
+                .ifPresentOrElse(cartEntity -> {
 
                     orderEntity.setCustomerEntityId(cartEntity.getCustomerId());
                     orderEntity.setAmount(cartEntity.getAmount());
@@ -51,6 +55,13 @@ public class OrderServiceImpl implements OrderService {
                     orderRepository.save(orderEntity);
 
                     cartEntity.getItems().forEach(cartItemEntity -> {
+
+                        //ürünün stoğu azaltılır ve sipariş edilen tutarı döndürür (Stok bilgisi göz önünde bulundurulur.)
+                        Integer quantityToOrder = productService.increaseStock(cartItemEntity.getProductEntity().getId(), cartItemEntity.getQuantity() );
+
+                        cartItemEntity.setQuantity(quantityToOrder);
+
+
                         OrderItemEntity orderItemEntity = new OrderItemEntity();
 
                         orderItemEntity.setProductEntityId(cartItemEntity.getProductEntity().getId());
@@ -63,10 +74,12 @@ public class OrderServiceImpl implements OrderService {
 
                     });
 
+                }, () -> {
+                    throw new RuntimeException("Müşteri bulunamadı.");
                 });
 
         if (orderEntity.getOrderItemEntities().isEmpty()) {
-            throw new RuntimeException("Cart is empty");
+            throw new RuntimeException("Sepet boş.");
         }
         orderRepository.save(orderEntity);
     }
@@ -77,7 +90,7 @@ public class OrderServiceImpl implements OrderService {
         List<OrderItemDTO> orderItemDTOs = new ArrayList<>();
         OrderDTO orderDTO = new OrderDTO();
 
-        orderRepository.findById(orderId).ifPresent(orderEntity -> {
+        orderRepository.findById(orderId).ifPresentOrElse(orderEntity -> {
             orderItemRepository.findByOrderEntityId(orderEntity.getId()).forEach(orderItemEntity -> {
                 OrderItemDTO orderItemDTO = orderItemMapper.toDTO(orderItemEntity);
                 orderItemDTOs.add(orderItemDTO);
@@ -85,6 +98,8 @@ public class OrderServiceImpl implements OrderService {
             orderDTO.setOrderItemEntities(orderItemDTOs);
             orderDTO.setAmount(orderEntity.getAmount());
             orderDTO.setCustomerId(orderEntity.getCustomerEntityId());
+        }, () -> {
+            throw new RuntimeException("Order not found");
         });
         return orderDTO;
     }
@@ -106,6 +121,10 @@ public class OrderServiceImpl implements OrderService {
             orderDTO.setOrderItemEntities(orderItemDTOs);
             orderDTOs.add(orderDTO);
         });
+
+        if (orderDTOs.isEmpty()) {
+            throw new RuntimeException("Müşteriye ait sipariş bulunamadı. Ya da müşteri bulunamadı.");
+        }
         return orderDTOs;
     }
 }

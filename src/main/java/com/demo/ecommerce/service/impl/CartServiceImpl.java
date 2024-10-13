@@ -42,45 +42,29 @@ public class CartServiceImpl implements CartService {
         AtomicReference<CartDTO> cartDTO = new AtomicReference<>(new CartDTO(new ArrayList<>()));
 
 
-        cartRepository.findByCustomerId(customerId).ifPresent(cart -> {
-
-            //Hibernate.initialize(cart.getItems());
+        cartRepository.findByCustomerId(customerId).ifPresentOrElse(cart -> {
 
             cart.getItems().forEach(cartItem -> {
-
                 CartItemDTO cartItemDTO = cartItemMapper.toDTO(cartItem);
-
-                /*CartItemDTO cartItemDTO = new CartItemDTO(
-                        cartItem.getProduct(),
-                        cartItem.getQuantity()
-                );*/
-                //cartItemDTO.setProduct(cartItem.getProduct());
-                //cartItemDTO.setQuantity(cartItem.getQuantity());
                 cartItemDTOs.add(cartItemDTO);
             });
 
             cartDTO.set(cartMapper.toDTO(cart));
 
-            /*cartDTO.setItems(cartItemDTOs);
-            cartDTO.setTotalAmount(cart.getAmount());*/
+        }, () -> {
+            throw new RuntimeException("Müşteri bulunamadı.");
         });
         return cartDTO.get();
     }
 
     @Override
     public void emptyCart(Long customerId) {
-        cartRepository.findByCustomerId(customerId).ifPresent(cart -> {
+        cartRepository.findByCustomerId(customerId).ifPresentOrElse(cart -> {
             cart.getItems().clear(); // Koleksiyonu temizle
             cart.setAmount(0.0);
             cartRepository.save(cart);
-/*
-            cartItemRepository.findByCartId(cart.getId()).ifPresent(
-                    cartItems -> {
-                        cartItems.forEach(cartItem -> {
-                            cartItemRepository.delete(cartItem);
-                        });
-                    }
-            );*/
+        }, () -> {
+            throw new RuntimeException("Müşteri bulunamadı.");
         });
     }
 
@@ -92,66 +76,89 @@ public class CartServiceImpl implements CartService {
         List<CartItemDTO> cartItemDTOs = new ArrayList<>();
         CartItemDTO cartItemDTO = new CartItemDTO(null, null);
 
-        cartRepository.findByCustomerId(customerId).ifPresent(cart -> {
-            cartItemRepository.findByCartIdAndProductEntityId(cart.getId(), productId).ifPresentOrElse(
-                    cartItem -> {
-                        // Mevcut ürün varsa miktarı güncelle
-                        cartItem.setQuantity(cartItem.getQuantity() + quantity);
-                        cartItemRepository.save(cartItem);
+        productRepository.findById(productId).ifPresentOrElse(product -> {
 
-                        // Toplam tutarı yeni miktar ve fiyatla güncelle
-                        cart.setAmount(cart.getAmount() + (cartItem.getProductEntity().getPrice() * quantity));
-                        cartRepository.save(cart);
-                    },
-                    () -> {
-                        // Mevcut ürün yoksa, yeni bir CartItem oluştur
-                        CartItemEntity newCartItemEntity = new CartItemEntity();
-                        newCartItemEntity.setCart(cart.getId());
-                        newCartItemEntity.setProductEntity(productRepository.findById(productId).orElseThrow(() ->
-                                new RuntimeException("Ürün bulunamadı.")));
-                        newCartItemEntity.setQuantity(quantity);
+            if(product.getStock() < quantity){
+                throw new RuntimeException("Stokta yeterli ürün yok.");
+            }
+
+            cartRepository.findByCustomerId(customerId).ifPresentOrElse(cart -> {
+                cartItemRepository.findByCartIdAndProductEntityId(cart.getId(), productId).ifPresentOrElse(
+                        cartItem -> {
+                            // Mevcut ürün varsa miktarı güncelle
+                            cartItem.setQuantity(cartItem.getQuantity() + quantity);
+                            cartItemRepository.save(cartItem);
+
+                            // Toplam tutarı yeni miktar ve fiyatla güncelle
+                            cart.setAmount(cart.getAmount() + (cartItem.getProductEntity().getPrice() * quantity));
+                            cartRepository.save(cart);
+                        },
+                        () -> {
+                            // Mevcut ürün yoksa, yeni bir CartItem oluştur
+                            CartItemEntity newCartItemEntity = new CartItemEntity();
+                            newCartItemEntity.setCart(cart.getId());
+                            newCartItemEntity.setProductEntity(productRepository.findById(productId).orElseThrow(() ->
+                                    new RuntimeException("Ürün bulunamadı.")));
+                            newCartItemEntity.setQuantity(quantity);
 
 
-                        //cart.getItems().add(newCartItem);
-                        List<CartItemEntity> cartItemEntities = cart.getItems();
-                        cartItemEntities.add(newCartItemEntity);
-                        cart.setItems(cartItemEntities);
+                            //cart.getItems().add(newCartItem);
+                            List<CartItemEntity> cartItemEntities = cart.getItems();
+                            cartItemEntities.add(newCartItemEntity);
+                            cart.setItems(cartItemEntities);
 
-                        // Toplam tutarı yeni miktar ve fiyatla güncelle
-                        cart.setAmount(cart.getAmount() + newCartItemEntity.getProductEntity().getPrice() * newCartItemEntity.getQuantity());
+                            // Toplam tutarı yeni miktar ve fiyatla güncelle
+                            cart.setAmount(cart.getAmount() + newCartItemEntity.getProductEntity().getPrice() * newCartItemEntity.getQuantity());
 
-                        // Yeni CartItemi veritabanına kaydet
-                        cartItemRepository.save(newCartItemEntity);
-                        cartRepository.save(cart);
-                    }
-            );
-
-            /*cart.getItems().forEach(cartItem -> {
-                cartItemDTO.setProduct(cartItem.getProduct());
-                cartItemDTO.setQuantity(cartItem.getQuantity());
-                cartItemDTOs.add(cartItemDTO);
+                            // Yeni CartItemi veritabanına kaydet
+                            cartItemRepository.save(newCartItemEntity);
+                            cartRepository.save(cart);
+                        }
+                );
+            }, () -> {
+                throw new RuntimeException("Müşteri bulunamadı.");
             });
-
-            cartItemRepository.findByCartId(cart.getId()).ifPresent(
-                    cartItems -> {
-                        cartItems.forEach(cartItem -> {
-                            cartItemDTO.setProduct(cartItem.getProduct());
-                            cartItemDTO.setQuantity(cartItem.getQuantity());
-                            cartItemDTOs.add(cartItemDTO);
-                        });
-                    }
-            );
-
-            cartDTO.setItems(cartItemDTOs);
-            cartDTO.setTotalAmount(cart.getAmount());
-            */
-
+        }
+        , () -> {
+            throw new RuntimeException("Ürün bulunamadı.");
         });
+
+
     }
 
     @Override
     public CartDTO removeProductFromCart(Long customerId, Long productId) {
         List<CartItemDTO> cartItemDTOs = new ArrayList<>();
+
+        cartRepository.findByCustomerId(customerId).ifPresentOrElse(cart -> {
+            cartItemRepository.findByCartIdAndProductEntityId(cart.getId(), productId).ifPresentOrElse(cartItem -> {
+                if (cartItem.getQuantity() > 1) {
+                    cartItem.setQuantity(cartItem.getQuantity() - 1);
+                    cartItemRepository.save(cartItem);
+                } else {
+                    cartItemRepository.delete(cartItem);
+                }
+                cart.setAmount(cart.getAmount() - cartItem.getProductEntity().getPrice());
+                cartRepository.save(cart);
+
+                cart.getItems().forEach(item -> {
+                    CartItemDTO cartItemDTO = new CartItemDTO(item.getProductEntity(), item.getQuantity());
+                    cartItemDTOs.add(cartItemDTO);
+                });
+
+            }, () -> {
+                throw new RuntimeException("Sepette bu ürün bulunmamakta.");
+            });
+
+        }, () -> {
+            throw new RuntimeException("Müşteri bulunamadı.");
+        });
+
+        return new CartDTO(cartItemDTOs);
+
+        //Eski Fonksiyon
+
+        /*List<CartItemDTO> cartItemDTOs = new ArrayList<>();
         CartItemDTO cartItemDTO = new CartItemDTO(null, null);
 
         Optional<CartEntity> cart = cartRepository.findByCustomerId(customerId);
@@ -177,6 +184,6 @@ public class CartServiceImpl implements CartService {
             cartItemDTO.setQuantity(item.getQuantity());
             cartItemDTOs.add(cartItemDTO);
         });
-        return new CartDTO(cartItemDTOs);
+        return new CartDTO(cartItemDTOs);*/
     }
 }
