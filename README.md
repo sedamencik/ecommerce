@@ -53,8 +53,8 @@ To get a local copy of this project up and running, follow these steps.
 1. **Clone the repository**
 
    ```bash
-   git clone https://github.com/your-username/ecommerce-backend.git
-   cd ecommerce-backend
+   git clone https://github.com/sedamencik/ecommerce.git
+   cd ecommerce
 
 2. **Configure the database**
 
